@@ -70,6 +70,19 @@ interface BasePlay {
    * @see BackgammonMoves (which is BackgammonMove[])
    */
   moves?: BackgammonMoves
+  /**
+   * The maximum number of dice any legal ordering can consume from the
+   * turn-start board (0-2 for a regular roll, 0-4 for doubles). Computed once
+   * when the play is initialized and used to enforce the rule that a player
+   * must use as many dice as legally possible.
+   */
+  maxDiceUsable?: number
+  /**
+   * The distinct die values that had at least one legal move individually on
+   * the turn-start board. Used to enforce the "must use the larger die" rule
+   * when only one of two dice can be played.
+   */
+  dieValuesPlayableAtStart?: BackgammonDieValue[]
 }
 
 interface Play extends BasePlay {
