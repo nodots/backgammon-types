@@ -34,6 +34,9 @@ import { BackgammonBoard } from './board'
 import { BackgammonMoveOrigin } from './checkercontainer'
 import { BackgammonCube } from './cube'
 import { BackgammonDiceRolled, BackgammonDieValue } from './dice'
+// Type-only import: erased at compile time, so the play.ts <-> game.ts file
+// cycle it introduces has no runtime effect.
+import type { BackgammonGameMoving } from './game'
 import { BackgammonMoveCompleted, BackgammonMoves } from './move'
 import {
   BackgammonPlayer,
@@ -71,6 +74,13 @@ interface BasePlay {
    */
   moves?: BackgammonMoves
   /**
+   * Turn-local undo stack. Frames are complete pre-move snapshots of the
+   * moving game state, pushed before each move and popped on undo. Only a
+   * play in the 'moving' state accumulates frames, but the field lives on the
+   * base so callers can read it off any BackgammonPlay without narrowing.
+   */
+  undo?: { frames: BackgammonGameMoving[] }
+  /**
    * The maximum number of dice any legal ordering can consume from the
    * turn-start board (0-2 for a regular roll, 0-4 for doubles). Computed once
    * when the play is initialized and used to enforce the rule that a player
@@ -106,9 +116,6 @@ export type BackgammonPlayMoving = Play & {
   stateKind: 'moving'
   player: BackgammonPlayerMoving
   moves: BackgammonMoves
-  // Turn-local undo stack. Frames are complete pre-move snapshots of the moving game state.
-  // Typed as any[] here to avoid circular dependency on BackgammonGameMoving at the types level.
-  undo?: { frames: any[] }
 }
 
 export type BackgammonPlayMoved = Play & {
